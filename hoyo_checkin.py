@@ -42,19 +42,23 @@ def hoyo_checkin(event_base_url: str, act_id: str) -> str:
     already_signed_in = info_list.get("data", {}).get("is_sign")
     first_bind = info_list.get("data", {}).get("first_bind")
 
+    # 获取奖励信息
+    awards_data = http.get(reward_url, headers=headers).json()
+    awards = awards_data.get("data", {}).get("awards")
+    reward = awards[total_sign_in_day - 1] if awards and total_sign_in_day > 0 else None
+
     if already_signed_in:
         log.info("今天已经签到过")
-        ret_msg = "今天已经签到过"
+        if reward:
+            ret_msg = f"今天已经签到过，获得的奖励是：{reward['cnt']}x 「{reward['name']}」"
+        else:
+            ret_msg = "今天已经签到过"
         return ret_msg
 
     if first_bind:
         log.info("请手动签到一次")
         ret_msg = "请手动签到一次"
         return ret_msg
-
-    awards_data = http.get(reward_url, headers=headers).json()
-
-    awards = awards_data.get("data", {}).get("awards")
 
     log.info(f"准备签到：{today} ")
 
@@ -71,21 +75,21 @@ def hoyo_checkin(event_base_url: str, act_id: str) -> str:
 
     if code == RET_CODE_ALREADY_SIGNED_IN:
         log.info("今天已经签到过")
-        ret_msg = "今天已经签到过"
+        if reward:
+            ret_msg = f"今天已经签到过，获得的奖励是：{reward['cnt']}x 「{reward['name']}」"
+        else:
+            ret_msg = "今天已经签到过"
         return ret_msg
     elif code != 0:
         log.error(response['message'])
         ret_msg = response['message']
         return ret_msg
 
-    reward = awards[total_sign_in_day - 1]
-
     log.info("签到成功")
     log.info(f"\t已连续签到 {total_sign_in_day + 1} 天")
     log.info(f"\t今天获得的奖励是：{reward['cnt']}x 「{reward['name']}」")
-    ret_msg = f"\t今天获得的奖励是：{reward['cnt']}x 「{reward['name']}」"
+    ret_msg = f"签到成功！今天获得的奖励是：{reward['cnt']}x 「{reward['name']}」"
     return ret_msg
-    # logging.info(f"\tMessage: {response['message']}")
 
 
 def genshin():
@@ -114,6 +118,7 @@ def tears_of_themis():
     ret_msg = '未定事件簿：\n' + hoyo_checkin("https://sg-public-api.hoyolab.com/event/luna/os",
                                         setting.os_tearsofthemis_act_id)
     return ret_msg
+
 
 def zzz():
     log.info(f"正在进行「绝区零」签到")
