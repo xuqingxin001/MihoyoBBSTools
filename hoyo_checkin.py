@@ -35,17 +35,22 @@ def hoyo_checkin(event_base_url: str, act_id: str) -> str:
     if act_id == setting.os_zzz_act_id:
         headers['x-rpc-signgame'] = "zzz"
 
+    # 先获取奖励信息
+    awards_data = http.get(reward_url, headers=headers).json()
+    awards = awards_data.get("data", {}).get("awards", [])
+    
+    # 再获取签到信息
     info_list = http.get(info_url, headers=headers).json()
 
     today = info_list.get("data", {}).get("today")
-    total_sign_in_day = info_list.get("data", {}).get("total_sign_day")
+    total_sign_in_day = info_list.get("data", {}).get("total_sign_day", 0)
     already_signed_in = info_list.get("data", {}).get("is_sign")
     first_bind = info_list.get("data", {}).get("first_bind")
 
-    # 获取奖励信息
-    awards_data = http.get(reward_url, headers=headers).json()
-    awards = awards_data.get("data", {}).get("awards")
-    reward = awards[total_sign_in_day - 1] if awards and total_sign_in_day > 0 else None
+    # 获取今天的奖励
+    reward = None
+    if awards and total_sign_in_day > 0 and total_sign_in_day <= len(awards):
+        reward = awards[total_sign_in_day - 1]
 
     if already_signed_in:
         log.info("今天已经签到过")
@@ -85,10 +90,18 @@ def hoyo_checkin(event_base_url: str, act_id: str) -> str:
         ret_msg = response['message']
         return ret_msg
 
+    # 签到成功后更新签到天数
+    total_sign_in_day += 1
+    if awards and total_sign_in_day <= len(awards):
+        reward = awards[total_sign_in_day - 1]
+
     log.info("签到成功")
-    log.info(f"\t已连续签到 {total_sign_in_day + 1} 天")
-    log.info(f"\t今天获得的奖励是：{reward['cnt']}x 「{reward['name']}」")
-    ret_msg = f"签到成功！今天获得的奖励是：{reward['cnt']}x 「{reward['name']}」"
+    log.info(f"\t已连续签到 {total_sign_in_day} 天")
+    if reward:
+        log.info(f"\t今天获得的奖励是：{reward['cnt']}x 「{reward['name']}」")
+        ret_msg = f"签到成功！今天获得的奖励是：{reward['cnt']}x 「{reward['name']}」"
+    else:
+        ret_msg = "签到成功！"
     return ret_msg
 
 
