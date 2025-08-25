@@ -81,13 +81,13 @@ key=xxxxxxxxxxxxxxxxxxxxxx
 mailhost=smtp.qq.com
 port=465
 ssl_enable=true
-fromaddr=xxx@example.com
-toaddr=xxx@example.com
+fromaddr=515861694@qq.com
+toaddr=515861694@qq.com
 # 邮件主题
 subject=AutoMihoyoBBS
-username=xxx@example.com
+username=515861694@qq.com
 # 授权码
-password=passward
+password=swguqnhtpqehcaba
 # 背景 开关
 background = true
 
