@@ -336,7 +336,7 @@ class PushHandler:
                 "priority": self.cfg.getint("gotify", "priority")
             }
         ).json()
-        log.info(f"推送结果：{rep.get('errmsg')}')
+        log.info(f"推送结果：{rep.get('errmsg')}")  # 修复了这里的引号问题
 
     def ifttt(self, status_id, push_message):
         """
@@ -371,7 +371,7 @@ class PushHandler:
                 "message": push_message
             }
         ).json()
-        log.info(f"推送结果：{rep.get('errmsg')}')
+        log.info(f"推送结果：{rep.get('errmsg')}")  # 修复了这里的引号问题
 
     def qmsg(self, status_id, push_message):
         """
