@@ -336,7 +336,7 @@ class PushHandler:
                 "priority": self.cfg.getint("gotify", "priority")
             }
         ).json()
-        log.info(f"推送结果：{rep.get('errmsg')}")
+        log.info(f"推送结果：{rep.get('errmsg')}')
 
     def ifttt(self, status_id, push_message):
         """
@@ -371,7 +371,7 @@ class PushHandler:
                 "message": push_message
             }
         ).json()
-        log.info(f"推送结果：{rep.get('errmsg')}")
+        log.info(f"推送结果：{rep.get('errmsg')}')
 
     def qmsg(self, status_id, push_message):
         """
@@ -399,6 +399,8 @@ class PushHandler:
                 embed_color = 16744192
             elif status_id == 3:  # 触发验证码
                 embed_color = 16744192
+            elif status_id == 4:  # 获得奖励
+                embed_color = 65280  # 绿色表示奖励
             return embed_color
 
         rep = self.http.post(
@@ -486,14 +488,40 @@ class PushHandler:
     # 其他推送方法，例如 ftqq, pushplus 等, 和 telegram 方法相似
     # 在类内部直接使用 self.cfg 读取配置
 
-    def push(self, status, push_message):
+    def push(self, status, push_message, reward_message=None):
         if not self.load_config():
             return 1
         if not self.cfg.getboolean('setting', 'enable'):
             return 0
+            
+        # 如果有奖励信息，优先推送奖励
+        if reward_message and self.cfg.getboolean('setting', 'reward_push_enable', fallback=True):
+            log.info("正在执行奖励推送......")
+            func_names = self.cfg.get('setting', 'push_server').lower()
+            push_success = True
+            for func_name in func_names.split(","):
+                func = getattr(self, func_name, None)
+                if not func:
+                    log.warning(f"推送服务名称错误：{func_name}")
+                    continue
+                log.debug(f"奖励推送所用的服务为: {func_name}")
+                try:
+                    func(4, self.msg_replace(reward_message))
+                except Exception as e:
+                    log.warning(f"{func_name} 奖励推送执行错误：{str(e)}")
+                    push_success = False
+                    continue
+                log.info(f"{func_name} - 奖励推送完毕......")
+            
+            # 如果配置了只推送奖励，不推送状态
+            if self.cfg.getboolean('setting', 'reward_push_only', fallback=False):
+                return 0 if push_success else 1
+            
+        # 错误推送限制检查
         if self.cfg.getboolean('setting', 'error_push_only', fallback=False) and status == 0:
             return 0
-        log.info("正在执行推送......")
+            
+        log.info("正在执行状态推送......")
         func_names = self.cfg.get('setting', 'push_server').lower()
         push_success = True
         for func_name in func_names.split(","):
@@ -501,7 +529,7 @@ class PushHandler:
             if not func:
                 log.warning(f"推送服务名称错误：{func_name}")
                 continue
-            log.debug(f"推送所用的服务为: {func_name}")
+            log.debug(f"状态推送所用的服务为: {func_name}")
             try:
                 if not config.update_config_need:
                     func(status, self.msg_replace(push_message))
@@ -510,17 +538,22 @@ class PushHandler:
                          f'如果您多次收到此消息开头的推送，证明您运行的环境无法自动更新config，请手动更新一下，谢谢\r\n'
                          f'{title.get(status, "")}\r\n{self.msg_replace(push_message)}')
             except Exception as e:
-                log.warning(f"{func_name} 推送执行错误：{str(e)}")
+                log.warning(f"{func_name} 状态推送执行错误：{str(e)}")
                 push_success = False
                 continue
-            log.info(f"{func_name} - 推送完毕......")
+            log.info(f"{func_name} - 状态推送完毕......")
         return 0 if push_success else 1
 
 
-def push(status, push_message):
+def push(status, push_message, reward_message=None):
     push_handler_instance = PushHandler()
-    return push_handler_instance.push(status, push_message)
+    return push_handler_instance.push(status, push_message, reward_message)
 
 
 if __name__ == "__main__":
+    # 测试普通推送
     push(0, f'推送验证{int(time.time())}')
+    
+    # 测试奖励推送
+    reward_msg = "今日获得了以下奖励：\n- 原石 × 60\n- 摩拉 × 10000\n- 经验书 × 3"
+    push(0, f'推送验证{int(time.time())}', reward_msg)
