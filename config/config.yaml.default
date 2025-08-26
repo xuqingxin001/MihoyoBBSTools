@@ -96,7 +96,7 @@ games:
 cloud_games:
   # 控制整个云游戏的签到
   cn:
-    enable: false
+    enable: true
     #云原神
     genshin:
       #开启签到
