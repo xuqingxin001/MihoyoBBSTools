@@ -100,9 +100,9 @@ cloud_games:
     #云原神
     genshin:
       #开启签到
-      enable: false
+      enable: true
       #这里填入抓包获得的token，支持多个
-      token: ""
+      token: "ai=4;ci=1;oi=20344972;ct=v2_7ff0dcc3cf2d314ebcc2cb7791836548c77bc288;si=26edcb6dd06b58d10c0caed7ff1e95bc93523fe405b7f05fbafed4dc6724023b;bi=hk4e_cn"
     #云绝区零
     zzz:
       enable: false
