@@ -105,8 +105,8 @@ cloud_games:
       token: "ai=4;ci=1;oi=20344972;ct=v2_7ff0dcc3cf2d314ebcc2cb7791836548c77bc288;si=26edcb6dd06b58d10c0caed7ff1e95bc93523fe405b7f05fbafed4dc6724023b;bi=hk4e_cn"
     #云绝区零
     zzz:
-      enable: false
-      token: ""
+      enable: true
+      token: "ai=12;ci=1;oi=20344972;ct=v2_31cdd2179f99a2088a637b3ce1758ea2455a1aba;si=2506c718a366ec5ef97a4829748b39de0237f3895827d136f0c59f0e34c5887e;bi=nap_cn"
   os:
     lang: "zh-cn"
     enable: false
