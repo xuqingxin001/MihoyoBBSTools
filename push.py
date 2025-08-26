@@ -488,11 +488,15 @@ class PushHandler:
     # 其他推送方法，例如 ftqq, pushplus 等, 和 telegram 方法相似
     # 在类内部直接使用 self.cfg 读取配置
 
-    def push(self, status, push_message, reward_message=None):
+    def push(self, status, push_message, reward_message=None, detailed_info=None):
         if not self.load_config():
             return 1
         if not self.cfg.getboolean('setting', 'enable'):
             return 0
+            
+        # 如果有详细执行信息，添加到推送消息中
+        if detailed_info:
+            push_message = f"{push_message}\n\n{detailed_info}"
             
         # 如果有奖励信息，优先推送奖励
         if reward_message and self.cfg.getboolean('setting', 'reward_push_enable', fallback=True):
@@ -545,9 +549,9 @@ class PushHandler:
         return 0 if push_success else 1
 
 
-def push(status, push_message, reward_message=None):
+def push(status, push_message, reward_message=None, detailed_info=None):
     push_handler_instance = PushHandler()
-    return push_handler_instance.push(status, push_message, reward_message)
+    return push_handler_instance.push(status, push_message, reward_message, detailed_info)
 
 
 if __name__ == "__main__":
@@ -556,4 +560,5 @@ if __name__ == "__main__":
     
     # 测试奖励推送
     reward_msg = "今日获得了以下奖励：\n- 原石 × 60\n- 摩拉 × 10000\n- 经验书 × 3"
-    push(0, f'推送验证{int(time.time())}', reward_msg)
+    detailed_info = "脚本执行完毕，共执行3个配置文件，成功3个，没执行0个，失败0个\n没执行的配置文件：[]\n执行失败的配置文件：[]\n触发游戏签到验证码的配置文件：[]"
+    push(0, f'推送验证{int(time.time())}', reward_msg, detailed_info)
