@@ -18,8 +18,7 @@ title = {
     0: "「米游社脚本」执行成功!",
     1: "「米游社脚本」执行失败!",
     2: "「米游社脚本」部分账号执行失败！",
-    3: "「米游社脚本」社区/游戏道具签到触发验证码！",
-    4: "「米游社脚本」获得奖励！"  # 新增的奖励提示
+    3: "「米游社脚本」社区/游戏道具签到触发验证码！"
 }
 
 
@@ -141,8 +140,8 @@ class PushHandler:
         """
         OneBot V11(CqHttp)协议推送
         """
-        qq = self.cfg.get('cqhttp', 'cqhttp_qq')
-        group = self.cfg.get('cqhttp', 'cqhttp_group')
+        qq = self.cfg.get('cqhttp', 'cqhttp_qq', fallback=None)
+        group = self.cfg.get('cqhttp', 'cqhttp_group', fallback=None)
 
         if qq and group:
             log.error("请只填写 cqhttp_qq 或 cqhttp_group 的其中一个，不要同时填写！")
@@ -336,7 +335,7 @@ class PushHandler:
                 "priority": self.cfg.getint("gotify", "priority")
             }
         ).json()
-        log.info(f"推送结果：{rep.get('errmsg')}")  # 修复了这里的引号问题
+        log.info(f"推送结果：{rep.get('errmsg')}")
 
     def ifttt(self, status_id, push_message):
         """
@@ -371,7 +370,7 @@ class PushHandler:
                 "message": push_message
             }
         ).json()
-        log.info(f"推送结果：{rep.get('errmsg')}")  # 修复了这里的引号问题
+        log.info(f"推送结果：{rep.get('errmsg')}")
 
     def qmsg(self, status_id, push_message):
         """
@@ -399,8 +398,6 @@ class PushHandler:
                 embed_color = 16744192
             elif status_id == 3:  # 触发验证码
                 embed_color = 16744192
-            elif status_id == 4:  # 获得奖励
-                embed_color = 65280  # 绿色表示奖励
             return embed_color
 
         rep = self.http.post(
@@ -488,44 +485,14 @@ class PushHandler:
     # 其他推送方法，例如 ftqq, pushplus 等, 和 telegram 方法相似
     # 在类内部直接使用 self.cfg 读取配置
 
-    def push(self, status, push_message, reward_message=None, detailed_info=None):
+    def push(self, status, push_message):
         if not self.load_config():
             return 1
         if not self.cfg.getboolean('setting', 'enable'):
             return 0
-            
-        # 如果有详细执行信息，添加到推送消息中
-        if detailed_info:
-            push_message = f"{push_message}\n\n{detailed_info}"
-            
-        # 如果有奖励信息，优先推送奖励
-        if reward_message and self.cfg.getboolean('setting', 'reward_push_enable', fallback=True):
-            log.info("正在执行奖励推送......")
-            func_names = self.cfg.get('setting', 'push_server').lower()
-            push_success = True
-            for func_name in func_names.split(","):
-                func = getattr(self, func_name, None)
-                if not func:
-                    log.warning(f"推送服务名称错误：{func_name}")
-                    continue
-                log.debug(f"奖励推送所用的服务为: {func_name}")
-                try:
-                    func(4, self.msg_replace(reward_message))
-                except Exception as e:
-                    log.warning(f"{func_name} 奖励推送执行错误：{str(e)}")
-                    push_success = False
-                    continue
-                log.info(f"{func_name} - 奖励推送完毕......")
-            
-            # 如果配置了只推送奖励，不推送状态
-            if self.cfg.getboolean('setting', 'reward_push_only', fallback=False):
-                return 0 if push_success else 1
-            
-        # 错误推送限制检查
         if self.cfg.getboolean('setting', 'error_push_only', fallback=False) and status == 0:
             return 0
-            
-        log.info("正在执行状态推送......")
+        log.info("正在执行推送......")
         func_names = self.cfg.get('setting', 'push_server').lower()
         push_success = True
         for func_name in func_names.split(","):
@@ -533,7 +500,7 @@ class PushHandler:
             if not func:
                 log.warning(f"推送服务名称错误：{func_name}")
                 continue
-            log.debug(f"状态推送所用的服务为: {func_name}")
+            log.debug(f"推送所用的服务为: {func_name}")
             try:
                 if not config.update_config_need:
                     func(status, self.msg_replace(push_message))
@@ -542,23 +509,17 @@ class PushHandler:
                          f'如果您多次收到此消息开头的推送，证明您运行的环境无法自动更新config，请手动更新一下，谢谢\r\n'
                          f'{title.get(status, "")}\r\n{self.msg_replace(push_message)}')
             except Exception as e:
-                log.warning(f"{func_name} 状态推送执行错误：{str(e)}")
+                log.warning(f"{func_name} 推送执行错误：{str(e)}")
                 push_success = False
                 continue
-            log.info(f"{func_name} - 状态推送完毕......")
+            log.info(f"{func_name} - 推送完毕......")
         return 0 if push_success else 1
 
 
-def push(status, push_message, reward_message=None, detailed_info=None):
+def push(status, push_message):
     push_handler_instance = PushHandler()
-    return push_handler_instance.push(status, push_message, reward_message, detailed_info)
+    return push_handler_instance.push(status, push_message)
 
 
 if __name__ == "__main__":
-    # 测试普通推送
     push(0, f'推送验证{int(time.time())}')
-    
-    # 测试奖励推送
-    reward_msg = "今日获得了以下奖励：\n- 原石 × 60\n- 摩拉 × 10000\n- 经验书 × 3"
-    detailed_info = "脚本执行完毕，共执行3个配置文件，成功3个，没执行0个，失败0个\n没执行的配置文件：[]\n执行失败的配置文件：[]\n触发游戏签到验证码的配置文件：[]"
-    push(0, f'推送验证{int(time.time())}', reward_msg, detailed_info)
