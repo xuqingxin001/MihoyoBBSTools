@@ -56,7 +56,7 @@ games:
       black_list: []
     #崩坏3
     honkai3rd:
-      checkin: false
+      checkin: true
       black_list: []
     #未定事件簿
     tears_of_themis:
