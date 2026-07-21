@@ -74,7 +74,7 @@ games:
   os:
     enable: true
     # 国际服专用Cookie填写
-    cookie: "mi18nLang=zh-cn; _HYVUUID=3ca4606a-1e45-414d-b66a-8b76cc5f8af8; HYV_LOGIN_PLATFORM_OPTIONAL_AGREEMENT={%22content%22:[]}; DEVICEFP_SEED_ID=41f4ba9472f4f018; DEVICEFP_SEED_TIME=1784643169775; DEVICEFP=38d7f78d92ef1; ma_passport_region=EU; account_mid_v2=1r1w0166jf_hy; account_id_v2=251962932; ltmid_v2=1r1w0166jf_hy; ltuid_v2=251962932; age_gate_country=NL; HYV_LOGIN_PLATFORM_LOAD_TIMEOUT={}; _MHYUUID=6e491226-c078-46a2-8279-4c7afe2ba61b; HYV_LOGIN_PLATFORM_TRACKING_MAP={%22sourceValue%22:%22422%22}; HYV_LOGIN_PLATFORM_LIFECYCLE_ID={%22value%22:%22338a62ea-f386-4cf3-ad9e-dce9ce358d4c%22}"
+    cookie: "mi18nLang=zh-cn; _HYVUUID=5f335fc0-29a0-4735-a02a-efb1574dcd84; HYV_LOGIN_PLATFORM_OPTIONAL_AGREEMENT={%22content%22:[]}; HYV_LOGIN_PLATFORM_TRACKING_MAP={%22sourceValue%22:%22422%22}; DEVICEFP=49480301316; HYV_LOGIN_PLATFORM_LOAD_TIMEOUT={%22value%22:null}; ma_passport_region=EU; cookie_token_v2=v2_CAQSDGM5b3FhcTNzM2d1OBokNWYzMzVmYzAtMjlhMC00NzM1LWEwMmEtZWZiMTU3NGRjZDg0ILiT_tIGKP_2kOcEMLTMknhCC2Jic19vdmVyc2VhagJFVQ.uIlfagAAAAAB.MEUCIDXaK8B3In8Ww_oJ5VXhAd2Rv3ikO75KlyDc7UafBH8vAiEA08NA2s_VFJ9cpzJm7i8xRHSQNYbGSRbMgGl42ajh7mw; account_mid_v2=1r1w0166jf_hy; account_id_v2=251962932; ltoken_v2=v2_CAISDGM5b3FhcTNzM2d1OBokNWYzMzVmYzAtMjlhMC00NzM1LWEwMmEtZWZiMTU3NGRjZDg0ILiT_tIGKIKc1LwEMLTMknhCC2Jic19vdmVyc2VhagJFVQ.uIlfagAAAAAB.MEYCIQD0sx0OVXiOJO2ZRbtPypXtcWCI3faXeSFj0rLIrIA5PgIhALMZTxqteT7jEnPH6ojep2sOgpE9rsoeLSL8VscG4CNE; ltmid_v2=1r1w0166jf_hy; ltuid_v2=251962932; age_gate_country=NL"
     # 国际服语言
     lang: "zh-cn"
     genshin:
