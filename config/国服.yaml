@@ -6,10 +6,10 @@ version: 15
 push: ""
 account:
   #登入账号只需要修改cookie就行了
-  cookie: ""
-  stuid: ""
-  stoken: ""
-  mid: ""
+  cookie: "_MHYUUID=4404a700-9605-421d-908c-a6046735db85; DEVICEFP_SEED_ID=be8d5e0ba708ae39; DEVICEFP_SEED_TIME=1784650372542; DEVICEFP=38d81aab8e2e9; MIHOYO_LOGIN_PLATFORM_LIFECYCLE_ID=80796ca785; cookie_token_v2=v2_Q6naUADTOc3jpot248nVyNPSrEaZolDvr6HkPOnSTHbYp-7lwJXvFZV2R-5ldLxS3e0VK23kwCdei43rJsa9DxicSLfvlRgncw88_hS3pcVtx0_tMpS5f4wLPkvfK-faLDRhrympH_qUE3FJ9g==.CAE=; account_mid_v2=0oapz85j2y_mhy; account_id_v2=20344972; ltoken_v2=v2_6-kZ_xMTJLvnE86tFofClASl1w-lxFusSnu9DSQ7A7vAmYtPrkhCrbf8KHvhM4_qKiZKpcYjhz-aIoLD4Kgr_o59t_mR12ZhhI_kgvBgkK2EOp00e8UBAJceH1KCjyCT0bbW3U5iaav_hM1aHQ==.CAE=; ltmid_v2=0oapz85j2y_mhy; ltuid_v2=20344972; cookie_token=fFnsiYlWo2IqAmuVJy3yZ8hWDqbOgrw6dPmWNPRc; account_id=20344972; ltoken=66XTID2jwy52S3pah0ycU7fO52ZtFCymFYIZg7zm; ltuid=20344972"
+  stuid: "20344972"
+  stoken: "v2_AocKKpB7HcV2YwG96m9Q-pO86uJHv6uGbdXi6Yq4A0cN_fK94lJSsx5LyzQkOciRNuT7ctCFTwyXyugiajTyIrsSCGqc4hv949uQF-0RFvMQIdyx00L6vZ0=.CAE=;device_id=;device_fp=38d81aaafef55"
+  mid: "0oapz85j2y_mhy"
 device:
   name: "Xiaomi MI 6"
   model: "Mi 6"
