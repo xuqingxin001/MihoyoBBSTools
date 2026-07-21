@@ -39,7 +39,7 @@ games:
   #国服控制区域
   cn:
     #控制是否启用国内签到
-    enable: false
+    enable: true
     #配置签到用的ua 脚本会在后面自动加上miHoYoBBS/版本号 ,请复制的时候不要带miHoYoBBS/版本
     useragent: "Mozilla/5.0 (Linux; Android 12; Unspecified Device) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/103.0.5060.129 Mobile Safari/537.36"
     #重试次数
@@ -72,7 +72,7 @@ games:
       black_list: []
   #国际服控制区域
   os:
-    enable: true
+    enable: false
     # 国际服专用Cookie填写
     cookie: "mi18nLang=zh-cn; _HYVUUID=3ca4606a-1e45-414d-b66a-8b76cc5f8af8; HYV_LOGIN_PLATFORM_OPTIONAL_AGREEMENT={%22content%22:[]}; HYV_LOGIN_PLATFORM_TRACKING_MAP={%22sourceValue%22:%22422%22}; DEVICEFP_SEED_ID=41f4ba9472f4f018; DEVICEFP_SEED_TIME=1784643169775; DEVICEFP=38d7f78d92ef1; HYV_LOGIN_PLATFORM_LOAD_TIMEOUT={%22value%22:null}; ma_passport_region=EU; account_mid_v2=1r1w0166jf_hy; account_id_v2=251962932; ltmid_v2=1r1w0166jf_hy; ltuid_v2=251962932; age_gate_country=NL"
     # 国际服语言
