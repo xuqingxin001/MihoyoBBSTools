@@ -73,18 +73,23 @@ def run_mihoyobbs() -> Tuple[str, bool]:
     return return_data, raise_stoken
 
 
-def run_cn_tasks() -> str:
-    """执行国服任务"""
+def run_os_tasks() -> str:
+    """执行国际服任务"""
     result = []
-    if config.config["games"]['cn']["enable"]:
-        result.append(gamecheckin.run_task())
-    if config.config["cloud_games"]['cn']["enable"]:
-        log.info("正在进行云游戏签到")
-        result.append(cloudgames.run_task())
-    cn_result = "\n\n".join(filter(None, result))
-    # 非空时加国服区域标题
-    if cn_result:
-        return f"========== 国服 ==========\n{cn_result}"
+    if config.config["games"]['os']["enable"]:
+        log.info("海外版：")
+        os_result = hoyo_checkin.run_task()
+        if os_result:
+            result.append(os_result)
+    if config.config["cloud_games"]['os']["enable"]:
+        log.info("正在进行云游戏国际版签到")
+        os_cloud_result = os_cloudgames.run_task()
+        if os_cloud_result:
+            result.append(os_cloud_result)
+    os_result = "\n\n".join(filter(None, result))
+    # 整个国际服结果加"海外版："前缀（用于多用户模式分类，最终推送里会去掉）
+    if os_result:
+        return f"海外版：{os_result}"
     return ""
 
 
