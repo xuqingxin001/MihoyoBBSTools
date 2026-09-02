@@ -81,21 +81,29 @@ def run_cn_tasks() -> str:
     if config.config["cloud_games"]['cn']["enable"]:
         log.info("正在进行云游戏签到")
         result.append(cloudgames.run_task())
-    return "\n\n".join(filter(None, result))
+    cn_result = "\n\n".join(filter(None, result))
+    # 非空时加国服区域标题
+    if cn_result:
+        return f"========== 国服 ==========\n{cn_result}"
+    return ""
 
 
 def run_os_tasks() -> str:
     """执行国际服任务"""
     result = []
     if config.config["games"]['os']["enable"]:
-        log.info("海外版：")
+        log.info("国际服：")
         os_result = hoyo_checkin.run_task()
         if os_result:
-            result.append(f"海外版：{os_result}")
+            result.append(os_result)
     if config.config["cloud_games"]['os']["enable"]:
         log.info("正在进行云游戏国际版签到")
         result.append(os_cloudgames.run_task())
-    return "\n\n".join(filter(None, result))
+    os_result = "\n\n".join(filter(None, result))
+    # 非空时加国际服区域标题
+    if os_result:
+        return f"========== 国际服 ==========\n{os_result}"
+    return ""
 
 
 def run_web_activity() -> None:
