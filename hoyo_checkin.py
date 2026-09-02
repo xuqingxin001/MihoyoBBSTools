@@ -8,6 +8,58 @@ from loghelper import log
 RET_CODE_ALREADY_SIGNED_IN = -5003
 
 
+def get_os_game_nicknames() -> dict:
+    """
+    获取国际服所有游戏的游戏内昵称
+    返回 {game_name: nickname} 字典，例如 {"原神": "荧", "绝区零": "东爱璃Lovely"}
+    """
+    http = get_new_session()
+    cookie_str = config.config.get("games", {}).get("os", {}).get("cookie", "")
+
+    # 从 Cookie 里提取 uid（ltuid_v2 字段）
+    uid = ""
+    for item in cookie_str.split(";"):
+        if "ltuid_v2" in item:
+            uid = item.split("=")[1].strip()
+            break
+    if not uid:
+        return {}
+
+    # 从 Cookie 里提取 device_id（_MHYUUID 字段）
+    device_id = ""
+    for item in cookie_str.split(";"):
+        if "_MHYUUID" in item:
+            device_id = item.split("=")[1].strip()
+            break
+
+    headers = {
+        "Referer": setting.os_referer_url,
+        "Origin": "https://www.hoyolab.com",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Cookie": cookie_str,
+        "x-rpc-app_version": "4.13.0",
+        "x-rpc-client_type": "4",
+        "x-rpc-language": "zh-cn",
+        "x-rpc-device_id": device_id,
+    }
+
+    nicknames = {}
+    try:
+        resp = http.get(
+            f"https://bbs-api-os.hoyolab.com/game_record/card/wapi/getGameRecordCard?uid={uid}",
+            headers=headers
+        ).json()
+        game_list = resp.get("data", {}).get("list", [])
+        for game in game_list:
+            game_name = game.get("game_name", "")
+            nickname = game.get("nickname", "")
+            if game_name and nickname:
+                nicknames[game_name] = nickname
+    except Exception as e:
+        log.warning(f"获取国际服游戏昵称失败：{str(e)}")
+    return nicknames
+
+
 def hoyo_checkin(event_base_url: str, act_id: str) -> str:
     """
     国际服游戏签到
@@ -42,19 +94,24 @@ def hoyo_checkin(event_base_url: str, act_id: str) -> str:
     already_signed_in = info_list.get("data", {}).get("is_sign")
     first_bind = info_list.get("data", {}).get("first_bind")
 
+    # 提前获取奖励列表（已签到时也要显示今天的奖励）
+    awards_data = http.get(reward_url, headers=headers).json()
+    awards = awards_data.get("data", {}).get("awards")
+
     if already_signed_in:
-        log.info("今天已经签到过")
-        ret_msg = "今天已经签到过"
+        # 已签到时，也显示连续签到天数和今天的奖励
+        if awards and total_sign_in_day > 0:
+            reward = awards[total_sign_in_day - 1]
+            ret_msg = f"已连续签到 {total_sign_in_day} 天\n今天获得的奖励是「{reward['name']}」x{reward['cnt']}"
+        else:
+            ret_msg = "今天已经签到过"
+        log.info(ret_msg)
         return ret_msg
 
     if first_bind:
         log.info("请手动签到一次")
         ret_msg = "请手动签到一次"
         return ret_msg
-
-    awards_data = http.get(reward_url, headers=headers).json()
-
-    awards = awards_data.get("data", {}).get("awards")
 
     log.info(f"准备签到：{today} ")
 
@@ -70,22 +127,25 @@ def hoyo_checkin(event_base_url: str, act_id: str) -> str:
     log.debug(f"return code {code}")
 
     if code == RET_CODE_ALREADY_SIGNED_IN:
-        log.info("今天已经签到过")
-        ret_msg = "今天已经签到过"
+        if awards and total_sign_in_day > 0:
+            reward = awards[total_sign_in_day - 1]
+            ret_msg = f"已连续签到 {total_sign_in_day} 天\n今天获得的奖励是「{reward['name']}」x{reward['cnt']}"
+        else:
+            ret_msg = "今天已经签到过"
+        log.info(ret_msg)
         return ret_msg
     elif code != 0:
         log.error(response['message'])
         ret_msg = response['message']
         return ret_msg
 
-    reward = awards[total_sign_in_day - 1]
+    reward = awards[total_sign_in_day]
 
     log.info("签到成功")
     log.info(f"\t已连续签到 {total_sign_in_day + 1} 天")
     log.info(f"\t今天获得的奖励是：{reward['cnt']}x 「{reward['name']}」")
-    ret_msg = f"\t今天获得的奖励是：{reward['cnt']}x 「{reward['name']}」"
+    ret_msg = f"已连续签到 {total_sign_in_day + 1} 天\n今天获得的奖励是「{reward['name']}」x{reward['cnt']}"
     return ret_msg
-    # logging.info(f"\tMessage: {response['message']}")
 
 
 def genshin():
@@ -132,10 +192,23 @@ def run_task():
         config.save_config()
         return ''
 
+    # 获取国际服所有游戏的游戏内昵称
+    nickname_dict = get_os_game_nicknames()
+
     for game, data in games.items():
         if isinstance(data, dict) and data.get('checkin', False):
             try:
-                ret_msg += f"\n\n{globals()[game]()}"
+                game_result = globals()[game]()
+                # 在游戏名后面加上游戏内昵称，比如 "原神（荧）："
+                if nickname_dict:
+                    for game_name, nickname in nickname_dict.items():
+                        prefix = f"{game_name}："
+                        if game_result.startswith(prefix):
+                            game_result = game_result.replace(
+                                prefix, f"{game_name}（{nickname}）：", 1
+                            )
+                            break
+                ret_msg += f"\n\n{game_result}"
             except KeyError:
                 pass
 
