@@ -67,7 +67,7 @@ def main_multi(autorun: bool) -> tuple:
         except KeyboardInterrupt:
             exit(0)
 
-    # ===== 改动1：新增 detail 字段，保存每个配置文件的详细执行结果 =====
+    # 新增 detail 字段，保存每个配置文件的详细执行结果
     results = {"ok": [], "close": [], "error": [], "captcha": [], "detail": {}}
 
     for i in config_list:
@@ -77,14 +77,14 @@ def main_multi(autorun: bool) -> tuple:
             run_code, run_message = main.main()
         except (CookieError, StokenError) as e:
             results["error"].append(i)
-            # ===== 改动2：出错时也记录详细信息 =====
+            # 出错时也记录详细信息
             results["detail"][i] = "账号 Cookie/Stoken 出错，未执行具体任务"
             if config.config.get("push", "") != "":
                 push_handler = push.PushHandler(config.config["push"])
                 error_msg = "账号 Cookie 出错！" if isinstance(e, CookieError) else "账号 Stoken 有问题！"
                 push_handler.push(1, error_msg)
         else:
-            # ===== 改动2：保存每个配置文件的详细执行结果 =====
+            # 保存每个配置文件的详细执行结果
             results["detail"][i] = run_message
 
             if run_code == 0:
@@ -100,15 +100,46 @@ def main_multi(autorun: bool) -> tuple:
         time.sleep(random.randint(3, 10))
     print("")
 
-    # ===== 改动3：推送消息里加上每个账号的详细结果 =====
-    push_message = f'脚本执行完毕，共执行{len(config_list)}个配置文件，成功{len(results["ok"])}个，' \
-                   f'没执行{len(results["close"])}个，失败{len(results["error"])}个' \
-                   f'\r\n没执行的配置文件：{results["close"]}\r\n执行失败的配置文件：{results["error"]}\r\n' \
-                   f'触发游戏签到验证码的配置文件：{results["captcha"]}' \
-                   f'\r\n\r\n===== 各账号详细签到结果 ====='
+    # 配置文件只显示名字（去掉.yaml/.yml后缀），用顿号分隔
+    def format_config_names(name_list):
+        if not name_list:
+            return "无"
+        names = [os.path.splitext(n)[0] for n in name_list]
+        return "、".join(names)
+
+    # 分类收集国服和国际服结果（配置文件只显示名字，不带后缀）
+    cn_results = []
+    os_results = []
 
     for config_name, detail_msg in results["detail"].items():
-        push_message += f'\r\n\r\n【账号配置：{config_name}】\r\n{detail_msg}'
+        if not detail_msg or not detail_msg.strip():
+            continue
+        # 配置文件只显示名字（去掉.yaml/.yml后缀）
+        short_name = os.path.splitext(config_name)[0]
+        if "海外版：" in detail_msg:
+            # 同时包含国服和国际服，按前缀拆分
+            parts = detail_msg.split("海外版：", 1)
+            cn_part = parts[0].strip()
+            os_part = parts[1].strip() if len(parts) > 1 else ""
+            if cn_part:
+                cn_results.append(f"【{short_name}】\r\n{cn_part}")
+            if os_part:
+                os_results.append(f"【{short_name}】\r\n{os_part}")
+        else:
+            # 纯国服内容
+            cn_results.append(f"【{short_name}】\r\n{detail_msg.strip()}")
+
+    # 构建推送消息
+    push_message = f'脚本执行完毕，共执行{len(config_list)}个配置文件，成功{len(results["ok"])}个，' \
+                   f'没执行{len(results["close"])}个，失败{len(results["error"])}个' \
+                   f'\r\n没执行的配置文件：{format_config_names(results["close"])}' \
+                   f'\r\n执行失败的配置文件：{format_config_names(results["error"])}' \
+                   f'\r\n触发游戏签到验证码的配置文件：{format_config_names(results["captcha"])}'
+
+    if cn_results:
+        push_message += f'\r\n\r\n===== 国服 =====\r\n\r\n' + "\r\n\r\n".join(cn_results)
+    if os_results:
+        push_message += f'\r\n\r\n===== 国际服 =====\r\n\r\n' + "\r\n\r\n".join(os_results)
 
     log.info(push_message)
 
