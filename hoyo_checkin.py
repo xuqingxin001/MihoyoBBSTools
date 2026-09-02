@@ -111,10 +111,10 @@ def hoyo_checkin(event_base_url: str, act_id: str) -> str:
     awards = awards_data.get("data", {}).get("awards")
 
     if already_signed_in:
-        # 已签到时，也显示连续签到天数和今天的奖励
+        # 已签到时，也显示连续签到天数和今天的奖励（格式跟国服统一，无空格）
         if awards and total_sign_in_day > 0:
             reward = awards[total_sign_in_day - 1]
-            ret_msg = f"已连续签到 {total_sign_in_day} 天\n今天获得的奖励是「{reward['name']}」x{reward['cnt']}"
+            ret_msg = f"已连续签到{total_sign_in_day}天\n今天获得的奖励是「{reward['name']}」x{reward['cnt']}"
         else:
             ret_msg = "今天已经签到过"
         log.info(ret_msg)
@@ -141,7 +141,7 @@ def hoyo_checkin(event_base_url: str, act_id: str) -> str:
     if code == RET_CODE_ALREADY_SIGNED_IN:
         if awards and total_sign_in_day > 0:
             reward = awards[total_sign_in_day - 1]
-            ret_msg = f"已连续签到 {total_sign_in_day} 天\n今天获得的奖励是「{reward['name']}」x{reward['cnt']}"
+            ret_msg = f"已连续签到{total_sign_in_day}天\n今天获得的奖励是「{reward['name']}」x{reward['cnt']}"
         else:
             ret_msg = "今天已经签到过"
         log.info(ret_msg)
@@ -154,42 +154,42 @@ def hoyo_checkin(event_base_url: str, act_id: str) -> str:
     reward = awards[total_sign_in_day]
 
     log.info("签到成功")
-    log.info(f"\t已连续签到 {total_sign_in_day + 1} 天")
+    log.info(f"\t已连续签到{total_sign_in_day + 1}天")
     log.info(f"\t今天获得的奖励是：{reward['cnt']}x 「{reward['name']}」")
-    ret_msg = f"已连续签到 {total_sign_in_day + 1} 天\n今天获得的奖励是「{reward['name']}」x{reward['cnt']}"
+    ret_msg = f"已连续签到{total_sign_in_day + 1}天\n今天获得的奖励是「{reward['name']}」x{reward['cnt']}"
     return ret_msg
 
 
 def genshin():
     log.info(f"正在进行「原神」签到")
-    ret_msg = '原神：\n' + hoyo_checkin("https://sg-hk4e-api.hoyolab.com/event/sol",
+    ret_msg = '原神:\n' + hoyo_checkin("https://sg-hk4e-api.hoyolab.com/event/sol",
                                      setting.os_genshin_act_id)
     return ret_msg
 
 
 def honkai_sr():
     log.info(f"正在进行「崩坏：星穹铁道」签到")
-    ret_msg = '崩坏：星穹铁道：\n' + hoyo_checkin("https://sg-public-api.hoyolab.com/event/luna/os",
+    ret_msg = '崩坏：星穹铁道:\n' + hoyo_checkin("https://sg-public-api.hoyolab.com/event/luna/os",
                                           setting.os_honkai_sr_act_id)
     return ret_msg
 
 
 def honkai3rd():
     log.info(f"正在进行「崩坏3」签到")
-    ret_msg = '崩坏3：\n' + hoyo_checkin("https://sg-public-api.hoyolab.com/event/mani",
+    ret_msg = '崩坏3:\n' + hoyo_checkin("https://sg-public-api.hoyolab.com/event/mani",
                                       setting.os_honkai3rd_act_id)
     return ret_msg
 
 
 def tears_of_themis():
     log.info(f"正在进行「未定事件簿」签到")
-    ret_msg = '未定事件簿：\n' + hoyo_checkin("https://sg-public-api.hoyolab.com/event/luna/os",
+    ret_msg = '未定事件簿:\n' + hoyo_checkin("https://sg-public-api.hoyolab.com/event/luna/os",
                                         setting.os_tearsofthemis_act_id)
     return ret_msg
 
 def zzz():
     log.info(f"正在进行「绝区零」签到")
-    ret_msg = '绝区零：\n' + hoyo_checkin("https://sg-act-nap-api.hoyolab.com/event/luna/zzz/os",
+    ret_msg = '绝区零:\n' + hoyo_checkin("https://sg-act-nap-api.hoyolab.com/event/luna/zzz/os",
                                       setting.os_zzz_act_id)
     return ret_msg
 
@@ -211,13 +211,13 @@ def run_task():
         if isinstance(data, dict) and data.get('checkin', False):
             try:
                 game_result = globals()[game]()
-                # 在游戏名后面加上游戏内昵称，比如 "原神（荧）："
+                # 跟国服格式统一：昵称加在"已连续签到"前面
                 if nickname_dict:
                     for game_name, nickname in nickname_dict.items():
-                        prefix = f"{game_name}："
+                        prefix = f"{game_name}:\n"
                         if game_result.startswith(prefix):
                             game_result = game_result.replace(
-                                prefix, f"{game_name}（{nickname}）：", 1
+                                "已连续签到", f"{nickname}已连续签到", 1
                             )
                             break
                 ret_msg += f"\n\n{game_result}"
