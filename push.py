@@ -164,13 +164,61 @@ class PushHandler:
     def smtp(self, status_id, push_message):
         """
         SMTP 电子邮件推送
+        支持三种背景方式（优先级从高到低）：
+        1. push.ini 配置的 http/https 网络 URL
+        2. push.ini 配置的本地文件名（自动去 assets 文件夹读取，转 Base64 内嵌）
+        3. 随机壁纸 API（默认 fallback）
         """
         import smtplib
         from email.mime.text import MIMEText
 
         def get_background_url():
+            """
+            获取背景图，支持三种方式（优先级从高到低）：
+            1. push.ini 配置的 http/https 网络 URL
+            2. push.ini 配置的本地文件名（自动去 assets 文件夹读取，转 Base64 内嵌）
+            3. 随机壁纸 API（默认 fallback）
+            """
             try:
-                _image_url = self.http.get("https://api.iw233.cn/api.php?sort=random&type=json").json()["pic"][0]
+                bg_config = self.cfg.get('smtp', 'background_url', fallback=None)
+                if bg_config and bg_config.strip():
+                    bg_config = bg_config.strip()
+
+                    # 方式1：http/https 开头，直接用网络 URL
+                    if bg_config.startswith('http://') or bg_config.startswith('https://'):
+                        log.info(f"使用网络背景图：{bg_config}")
+                        return bg_config
+
+                    # 方式2：否则视为本地文件名，去 assets 文件夹读取并转 Base64
+                    local_path = os.path.join(
+                        os.path.dirname(os.path.realpath(__file__)),
+                        'assets',
+                        bg_config
+                    )
+                    if os.path.exists(local_path):
+                        # 根据扩展名判断 MIME 类型
+                        ext = os.path.splitext(local_path)[1].lower()
+                        mime_map = {
+                            '.jpg': 'image/jpeg',
+                            '.jpeg': 'image/jpeg',
+                            '.png': 'image/png',
+                            '.gif': 'image/gif',
+                            '.webp': 'image/webp',
+                            '.bmp': 'image/bmp',
+                        }
+                        mime_type = mime_map.get(ext, 'image/jpeg')
+                        with open(local_path, 'rb') as f:
+                            img_base64 = base64.b64encode(f.read()).decode('utf-8')
+                        log.info(f"使用本地背景图（Base64内嵌）：{bg_config}")
+                        return f"data:{mime_type};base64,{img_base64}"
+                    else:
+                        log.warning(f"本地背景图不存在：{local_path}，将回退到随机壁纸")
+            except Exception as e:
+                log.warning(f"读取自定义背景失败：{str(e)}，将回退到随机壁纸")
+
+            # 方式3：没配置或读取失败，使用随机壁纸
+            try:
+                _image_url = self.http.get("https://www.loliapi.com/acg/pc/").url
             except:
                 _image_url = "unable to get the image"
                 log.warning("获取随机背景图失败，请检查图片 api")
@@ -243,7 +291,7 @@ class PushHandler:
         企业微信机器人
         """
         rep = self.http.post(
-            url=f'{self.cfg.get("wecomrobot", "url")}',
+            url=self.cfg.get("wecomrobot", "url"),
             headers={"Content-Type": "application/json; charset=utf-8"},
             json={
                 "msgtype": "text",
