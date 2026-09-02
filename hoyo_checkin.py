@@ -16,20 +16,30 @@ def get_os_game_nicknames() -> dict:
     http = get_new_session()
     cookie_str = config.config.get("games", {}).get("os", {}).get("cookie", "")
 
-    # 从 Cookie 里提取 uid（ltuid_v2 字段）
+    # 从 Cookie 里提取 uid（支持多种字段名）
     uid = ""
-    for item in cookie_str.split(";"):
-        if "ltuid_v2" in item:
-            uid = item.split("=")[1].strip()
+    uid_fields = ["ltuid_v2", "ltuid", "account_id", "uid", "stuid"]
+    for field in uid_fields:
+        for item in cookie_str.split(";"):
+            if field in item and "=" in item:
+                value = item.split("=", 1)[1].strip()
+                if value and value.isdigit():
+                    uid = value
+                    break
+        if uid:
             break
+
     if not uid:
+        log.warning("国际服 Cookie 中未找到 uid，无法获取游戏昵称")
         return {}
+
+    log.info(f"国际服账号 uid：{uid}")
 
     # 从 Cookie 里提取 device_id（_MHYUUID 字段）
     device_id = ""
     for item in cookie_str.split(";"):
-        if "_MHYUUID" in item:
-            device_id = item.split("=")[1].strip()
+        if "_MHYUUID" in item and "=" in item:
+            device_id = item.split("=", 1)[1].strip()
             break
 
     headers = {
@@ -49,12 +59,14 @@ def get_os_game_nicknames() -> dict:
             f"https://bbs-api-os.hoyolab.com/game_record/card/wapi/getGameRecordCard?uid={uid}",
             headers=headers
         ).json()
+        log.info(f"获取游戏卡片接口返回：retcode={resp.get('retcode')}, message={resp.get('message')}")
         game_list = resp.get("data", {}).get("list", [])
         for game in game_list:
             game_name = game.get("game_name", "")
             nickname = game.get("nickname", "")
             if game_name and nickname:
                 nicknames[game_name] = nickname
+        log.info(f"获取到的游戏昵称：{nicknames}")
     except Exception as e:
         log.warning(f"获取国际服游戏昵称失败：{str(e)}")
     return nicknames
