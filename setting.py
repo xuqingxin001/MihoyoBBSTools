@@ -120,7 +120,7 @@ genshin_act_id = "e202311201442471"
 honkai_sr_act_id = "e202304121516551"
 
 # 绝区零自动签到相关设置
-zzz_web_api = 'https://act-nap-api.mihoyo.com'
+zzz_web_api = 'https://api-takumi.mihoyo.com'
 zzz_game_checkin_rewards = f"{zzz_web_api}/event/luna/zzz/home?lang={cn_game_lang}"
 zzz_game_is_signurl = f"{zzz_web_api}/event/luna/zzz/info?lang={cn_game_lang}"
 zzz_game_sign_url = f"{zzz_web_api}/event/luna/zzz/sign"
