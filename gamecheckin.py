@@ -226,7 +226,7 @@ class Genshin(GameCheckin):
         self.is_sign_api = f"{setting.web_api}/event/luna/hk4e/info?lang={setting.cn_game_lang}"
         self.sign_api = f"{setting.web_api}/event/luna/hk4e/sign"
         self.headers["Origin"] = "https://act.mihoyo.com"
-       # self.headers["x-rpc-signgame"] = "hk4e"
+        self.headers["x-rpc-signgame"] = "hk4e"
         self.init()
 
 
@@ -249,7 +249,7 @@ class ZZZ(GameCheckin):
         self.is_sign_api = f"{setting.web_api}/event/luna/zzz/info?lang={setting.cn_game_lang}"
         self.sign_api = f"{setting.web_api}/event/luna/zzz/sign"
         self.headers["Origin"] = "https://act.mihoyo.com"
-        self.headers["x-rpc-signgame"] = "zzz"
+        # self.headers["x-rpc-signgame"] = "zzz"
         self.init()
 
 
