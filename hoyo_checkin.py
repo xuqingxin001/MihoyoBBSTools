@@ -1,4 +1,4 @@
-import time
+﻿import time
 import random
 import setting
 import config
@@ -162,34 +162,34 @@ def hoyo_checkin(event_base_url: str, act_id: str) -> str:
 
 def genshin():
     log.info(f"正在进行「原神」签到")
-    ret_msg = '原神:\n' + hoyo_checkin("https://sg-hk4e-api.hoyolab.com/event/sol",
+    ret_msg = '原神:\n' + hoyo_checkin("https://sg-act-public-api.hoyolab.com/event/sol",
                                      setting.os_genshin_act_id)
     return ret_msg
 
 
 def honkai_sr():
     log.info(f"正在进行「崩坏：星穹铁道」签到")
-    ret_msg = '崩坏：星穹铁道:\n' + hoyo_checkin("https://sg-public-api.hoyolab.com/event/luna/os",
+    ret_msg = '崩坏：星穹铁道:\n' + hoyo_checkin("https://sg-act-public-api.hoyolab.com/event/luna/hkrpg/os",
                                           setting.os_honkai_sr_act_id)
     return ret_msg
 
 
 def honkai3rd():
     log.info(f"正在进行「崩坏3」签到")
-    ret_msg = '崩坏3:\n' + hoyo_checkin("https://sg-public-api.hoyolab.com/event/mani",
+    ret_msg = '崩坏3:\n' + hoyo_checkin("https://sg-act-public-api.hoyolab.com/event/mani",
                                       setting.os_honkai3rd_act_id)
     return ret_msg
 
 
 def tears_of_themis():
     log.info(f"正在进行「未定事件簿」签到")
-    ret_msg = '未定事件簿:\n' + hoyo_checkin("https://sg-public-api.hoyolab.com/event/luna/os",
+    ret_msg = '未定事件簿:\n' + hoyo_checkin("https://sg-act-public-api.hoyolab.com/event/luna/nxx/os",
                                         setting.os_tearsofthemis_act_id)
     return ret_msg
 
 def zzz():
     log.info(f"正在进行「绝区零」签到")
-    ret_msg = '绝区零:\n' + hoyo_checkin("https://sg-act-nap-api.hoyolab.com/event/luna/zzz/os",
+    ret_msg = '绝区零:\n' + hoyo_checkin("https://sg-act-public-api.hoyolab.com/event/luna/zzz/os",
                                       setting.os_zzz_act_id)
     return ret_msg
 

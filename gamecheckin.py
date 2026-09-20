@@ -182,6 +182,10 @@ class GameCheckin:
 class Honkai2(GameCheckin):
     def __init__(self) -> None:
         super().__init__("bh2_cn", "honkai2", "崩坏学园2", setting.honkai2_act_id)
+        # 新版 API（路径带游戏缩写）
+        self.rewards_api = f"{setting.web_api}/event/luna/bh2/home?lang={setting.cn_game_lang}"
+        self.is_sign_api = f"{setting.web_api}/event/luna/bh2/info?lang={setting.cn_game_lang}"
+        self.sign_api = f"{setting.web_api}/event/luna/bh2/sign"
         self.headers['Referer'] = 'https://webstatic.mihoyo.com/bbs/event/signin/bh2/index.html?bbs_auth_required' \
                                   f'=true&act_id={setting.honkai2_act_id}&bbs_presentation_style=fullscreen' \
                                   '&utm_source=bbs&utm_medium=mys&utm_campaign=icon'
@@ -191,6 +195,10 @@ class Honkai2(GameCheckin):
 class Honkai3rd(GameCheckin):
     def __init__(self) -> None:
         super().__init__("bh3_cn", "honkai3rd", "崩坏3", setting.honkai3rd_act_id, "舰长")
+        # 新版 API（路径带游戏缩写）
+        self.rewards_api = f"{setting.web_api}/event/luna/bh3/home?lang={setting.cn_game_lang}"
+        self.is_sign_api = f"{setting.web_api}/event/luna/bh3/info?lang={setting.cn_game_lang}"
+        self.sign_api = f"{setting.web_api}/event/luna/bh3/sign"
         self.headers['Referer'] = 'https://webstatic.mihoyo.com/bbs/event/signin/bh3/index.html?bbs_auth_required' \
                                   f'=true&act_id={setting.honkai3rd_act_id}&bbs_presentation_style=fullscreen' \
                                   '&utm_source=bbs&utm_medium=mys&utm_campaign=icon'
@@ -200,6 +208,10 @@ class Honkai3rd(GameCheckin):
 class TearsOfThemis(GameCheckin):
     def __init__(self) -> None:
         super().__init__("nxx_cn", "tears_of_themis", "未定事件簿", setting.tearsofthemis_act_id, "律师")
+        # 新版 API（路径带游戏缩写）
+        self.rewards_api = f"{setting.web_api}/event/luna/nxx/home?lang={setting.cn_game_lang}"
+        self.is_sign_api = f"{setting.web_api}/event/luna/nxx/info?lang={setting.cn_game_lang}"
+        self.sign_api = f"{setting.web_api}/event/luna/nxx/sign"
         self.headers['Referer'] = 'https://webstatic.mihoyo.com/bbs/event/signin/nxx/index.html?bbs_auth_required' \
                                   '=true&bbs_presentation_style=fullscreen' \
                                   f'act_id={setting.tearsofthemis_act_id}'
@@ -209,6 +221,10 @@ class TearsOfThemis(GameCheckin):
 class Genshin(GameCheckin):
     def __init__(self) -> None:
         super().__init__("hk4e_cn", "genshin", "原神", setting.genshin_act_id, "旅行者")
+        # 新版 API（路径带游戏缩写）
+        self.rewards_api = f"{setting.web_api}/event/luna/hk4e/home?lang={setting.cn_game_lang}"
+        self.is_sign_api = f"{setting.web_api}/event/luna/hk4e/info?lang={setting.cn_game_lang}"
+        self.sign_api = f"{setting.web_api}/event/luna/hk4e/sign"
         self.headers["Origin"] = "https://act.mihoyo.com"
         self.headers["x-rpc-signgame"] = "hk4e"
         self.init()
@@ -217,6 +233,10 @@ class Genshin(GameCheckin):
 class Honkaisr(GameCheckin):
     def __init__(self):
         super().__init__("hkrpg_cn", "honkai_sr", "崩坏：星穹铁道", setting.honkai_sr_act_id, "开拓者")
+        # 新版 API（路径带游戏缩写）
+        self.rewards_api = f"{setting.web_api}/event/luna/hkrpg/home?lang={setting.cn_game_lang}"
+        self.is_sign_api = f"{setting.web_api}/event/luna/hkrpg/info?lang={setting.cn_game_lang}"
+        self.sign_api = f"{setting.web_api}/event/luna/hkrpg/sign"
         self.headers["Origin"] = "https://act.mihoyo.com"
         self.init()
 
@@ -224,6 +244,10 @@ class Honkaisr(GameCheckin):
 class ZZZ(GameCheckin):
     def __init__(self):
         super().__init__("nap_cn", "zzz", "绝区零", setting.zzz_act_id, "绳匠")
+        # 新版 API（路径带游戏缩写）
+        self.rewards_api = f"{setting.web_api}/event/luna/zzz/home?lang={setting.cn_game_lang}"
+        self.is_sign_api = f"{setting.web_api}/event/luna/zzz/info?lang={setting.cn_game_lang}"
+        self.sign_api = f"{setting.web_api}/event/luna/zzz/sign"
         self.headers["Origin"] = "https://act.mihoyo.com"
         self.headers['X-Rpc-Signgame'] = 'zzz'
         self.rewards_api = setting.zzz_game_checkin_rewards
